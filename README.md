@@ -129,3 +129,17 @@ console.log(f.bar());
 
 - 브라우저는 CommonJS 방식의 require 함수를 지원하지 않으므로 브라우저에서 실행시 에러가 발생한다.
 - 이러한 문제는 Webpack을 통해 해결할 수 있다.
+
+
+## npm, yarn
+- package.json
+프로젝트 관리, 어떤 모듈을 사용했고, 그 버전을 기록해놓음으로써 어디에서나 동일한 개발환경에서 작업할 수 있도록 해준다.
+- npm(Node Package Manager)
+node.js로 만들어진 모듈을 쉽게 설치하고 관리할 수 있게 도와주는 관리자.
+- package-lock.json
+package.json에서는 버전정보를 저장할 때 version range를 사용.(버전이 12면 12이상의 버전을 사용하겠다~)
+그래서 동일한 개발환경에서 작업해야할 때 package.json에서 다른 버전으로 설치될 위험이 있으며 이는 곧 문제를 야기할 수 있다.
+그래서 package-lock.json에서는 정확한 버전명을 명시하고 있으며, npm i 시 이 lock 파일을 참고하여 모듈을 설치하게 된다.
+- 결론 package-lock.json을 꼭 같이 레포지토리에 커밋하자.
+-https://junwoo45.github.io/
+- 
