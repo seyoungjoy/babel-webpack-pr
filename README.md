@@ -142,4 +142,96 @@ package.json에서는 버전정보를 저장할 때 version range를 사용.(버
 그래서 package-lock.json에서는 정확한 버전명을 명시하고 있으며, npm i 시 이 lock 파일을 참고하여 모듈을 설치하게 된다.
 - 결론 package-lock.json을 꼭 같이 레포지토리에 커밋하자.
 -https://junwoo45.github.io/
-- 
+
+## 49.2 Webpack
+- 의존 관계에 있는 자바스크립트, css, 이미지 등의 리소스들을 하나의 파일로 번들링하는 모듈 번들러.
+- 여러 개의 js 파일을 하나로 번들링하기 때문에 html에 script 태그로 여러개의 js 파일을 로드해야하는 번거로움도 사라진다.
+
+### 49.2.1 Webpack 설치
+```jsx
+$ npm install --save-dev webpack webpack-cli
+```
+-package.json
+```jsx
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
+    "@babel/plugin-proposal-class-properties": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
+  }
+```
+### 49.2.2 babel-loader 설치
+- Webpack이 모듈을 번들링할 때 Babel을 사용해서 트랜스파일링되도록 babel-loader를 설치한다.
+```
+npm install --save-dev babel-loader
+```
+
+- npm scripts를 변경하여 Babel 대신 Webpack이 실행되도록 설정한다.
+```jsx
+"scripts": {
+    "build": "webpack -w"
+  },
+```
+### 49.2.3 webpack.config.js 설정 파일 작성
+-`webpack.config.js`는 Webpack이 실행될 때 참조하는 설정 파일이다.
+```jsx
+const path = require('path');
+
+module.exports = {
+    //entry file
+    entry: './src/js/main.js',
+    //번들링된 js 파일의 이름과 저장될 경로(path)를 지정
+    output:{
+        path: path.resolve(__dirname, 'dist/js'),
+        filename:'bundle.js'
+    },
+    module:{
+        rules:[
+            {
+                // test:∧.js$/,
+                include:[
+                    path.resolve(__dirname, 'src/js')
+                ],
+                exclude:/node_modules/,
+                use:{
+                    loader:'babel-loader',
+                    options:{
+                        presets:['@babel/preset-env'],
+                        // plugins:['@babel/plugin-proposal-class-properties']
+                    }
+                }
+            }
+        ]
+    },
+    devtool: 'source-map',
+    mode:'development'
+}
+
+```
+- npm run build로 번들링을 시키면 dist/js에 bundle.js라는 번들링파일이 생긴다. 이것을 html script 태그로 로드시켜주면 된다.
+
+### 49.2.4 babel-pollyfill 설치
+- babel로 트랜스파일링을해도 브라우저에서 지원하지 않는 코드가 남아있을 수 있다.
+- ES6에서 추가된 Promise, Object.assign, Array.from 등은 ES5에서 대체할 수 있는 기능이 없기 때문.
+- 따라서 IE나 구형 브라우저에서도 이런 기능들을 사용하기 위해서는 @babel/polyfill을 설치해야한다.
+```
+$ npm install @babel/polyfill
+```
+- 폴리필은 개발 환경 뿐만 아니라 실제 운영 환경에서도 사용해야한다. 따라서 의존성(dependencies)으로 설치.
+- ES6의 import를 사용하는 경우에는 진입점의 선두에서 먼저 폴리필을 로드.
+```jsx
+//src/js/main.js
+import "babel/polyfill";
+import {pi, power, Foo} from './lib';
+```
+
+- Webpack 사용시 webpack.config.js 파일의 entry배열에 폴리필을 추가
+```jsx
+const path = require('path');
+
+module.exports = {
+  entry:['@babel/polyfill', './src/js/main.js'],
+  ...
+}
